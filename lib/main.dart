@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_practice/screens/AddListScreen.dart';
 import 'package:flutter_practice/screens/HomeScreen.dart';
+import 'package:flutter_practice/screens/ProfileScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,15 +17,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Flutter'),
@@ -34,15 +27,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -51,29 +35,35 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
-  String _contentName = "Home";
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
-      _contentName = index == 0 ? "Home" : (index == 1 ? "Cart" : "Profile");
       _selectedIndex = index;
     });
   }
 
-  void _changeText(String name) {
-    setState(() {
-      _contentName = name;
-      scaffoldKey.currentState?.openEndDrawer();
-    });
+  void moveToProfileScreen() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const ProfileScreen()));
   }
 
-  void moveToNextScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
+  void _showToast(BuildContext context) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: const Text('Fab Clicked',style: TextStyle(fontFamily: 'Roboto'),),
+        action: SnackBarAction(
+            label: 'UNDO', onPressed: scaffold.hideCurrentSnackBar),
+      ),
     );
   }
+
+  final screens = [
+    const HomeScreen(),
+    const AddListScreen(),
+    const ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
           icon: const Icon(Icons.menu, color: Colors.black),
           onPressed: () => scaffoldKey.currentState?.openDrawer(),
         ),
-        title: Text(widget.title),
+        title: Text(widget.title,),
       ),
       drawer: Drawer(
         child: ListView(
@@ -103,11 +93,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-
             ListTile(
               title: const Text('Flutter'),
               onTap: () {
-                _changeText("Flutter");
+                scaffoldKey.currentState?.openEndDrawer();
               },
               leading: const Icon(Icons.flutter_dash),
               trailing: const Icon(Icons.navigate_next_outlined),
@@ -115,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: const Text('Android'),
               onTap: () {
-                _changeText("Android");
+                scaffoldKey.currentState?.openEndDrawer();
               },
               leading: const Icon(Icons.android),
               trailing: const Icon(Icons.navigate_next_outlined),
@@ -123,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: const Text('Ios'),
               onTap: () {
-                _changeText("Ios");
+                scaffoldKey.currentState?.openEndDrawer();
               },
               leading: const Icon(Icons.apple),
               trailing: const Icon(Icons.navigate_next_outlined),
@@ -131,45 +120,47 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              _contentName,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 20,
-                  color: Colors.black,
-                  overflow: TextOverflow.ellipsis),
-              maxLines: 2,
-            )
-          ],
-        ),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: screens,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: moveToNextScreen,
-        child: const Icon(Icons.navigate_next),
-      ),
+      // floating button hide
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //           builder: (context) => CallBackFunction(
+      //               text: "Clicked", onPressed: () => _showToast(context)))),
+      //   child: const Icon(Icons.navigate_next),
+      // ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home,color: Colors.white,),
+            icon: Icon(
+              Icons.home,
+              color: _selectedIndex == 0 ? Colors.white : Colors.black,
+            ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_shopping_cart,color: Colors.white,),
-            label: 'Cart',
+            icon: Icon(
+              Icons.add,
+              color: _selectedIndex == 1 ? Colors.white : Colors.black,
+            ),
+            label: 'Add',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people,color: Colors.white,),
+            icon: Icon(
+              Icons.people,
+              color: _selectedIndex == 2 ? Colors.white : Colors.black,
+            ),
             label: 'Profile',
           ),
         ],
-        currentIndex: _selectedIndex,
         backgroundColor: Colors.blue,
         selectedItemColor: Colors.white,
-        onTap: _onItemTapped,
       ),
     );
   }
