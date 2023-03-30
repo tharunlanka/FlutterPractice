@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_practice/screens/utilities/ElevatedButtonWidget.dart';
-import 'package:flutter_practice/screens/utilities/TextWidget.dart';
+import 'package:flutter_practice/utilities/LinearGradientWidget.dart';
+
+import '../widgets/ElevatedButtonWidget.dart';
+import '../widgets/TextWidget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -78,30 +80,43 @@ class _HomeScreen extends State<HomeScreen> {
               )
             ],
           )
-        : Card(
-            margin: const EdgeInsets.all(10),
-            color: Colors.green[100],
-            shadowColor: Colors.blueGrey,
-            elevation: 10,
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              const TextWidget(textData: "NO Questions to Practice"),
-              TextButton(
-                  onPressed: _onBackPressed,
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.blue),
-                      maximumSize:
-                          MaterialStateProperty.all(const Size(200, 100)),
-                      elevation: MaterialStateProperty.all(8),
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50))),
-                      padding:
-                          MaterialStateProperty.all(const EdgeInsets.all(10))),
-                  child: const Text(
-                    "Back T0 Home",
-                    style: TextStyle(color: Colors.black, fontSize: 20),
-                  ))
-            ]),
+        : LinearGradientWidget(
+            gradientColors: const [
+              Color(0xff5b0060),
+              Color(0xff870160),
+              Color(0xffac255e),
+              Color(0xffca485c),
+              Color(0xffe16b5c),
+              Color(0xfff39060),
+              Color(0xffffb56b),
+            ],
+            child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+            const CircleAvatar(
+              // network  image
+            backgroundImage:NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThwH3uhjDlPyydY9SCwGkPqeF4s1esHTEM2Q&usqp=CAU'),
+            ),
+                  const TextWidget(textData: "NO Questions to Practice"),
+                  TextButton(
+                      onPressed: _onBackPressed,
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.blue),
+                          maximumSize:
+                              MaterialStateProperty.all(const Size(200, 100)),
+                          elevation: MaterialStateProperty.all(8),
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50))),
+                          padding: MaterialStateProperty.all(
+                              const EdgeInsets.all(10))),
+                      child: const Text(
+                        "Back To Home",
+                        style: TextStyle(color: Colors.black, fontSize: 20),
+                      ))
+                ]),
           );
   }
 }

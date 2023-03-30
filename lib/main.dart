@@ -1,9 +1,16 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
-import 'package:flutter_practice/screens/AddListScreen.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_practice/screens/AddTransactionScreen.dart';
 import 'package:flutter_practice/screens/HomeScreen.dart';
 import 'package:flutter_practice/screens/ProfileScreen.dart';
 
 void main() {
+  // to set the orientation in portrait only
+  // WidgetsFlutterBinding.ensureInitialized();
+  //
+  // SystemChrome.setPreferredOrientations(
+  //     [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());
 }
 
@@ -48,34 +55,40 @@ class _MyHomePageState extends State<MyHomePage> {
         MaterialPageRoute(builder: (context) => const ProfileScreen()));
   }
 
-  void _showToast(BuildContext context) {
-    final scaffold = ScaffoldMessenger.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        content: const Text('Fab Clicked',style: TextStyle(fontFamily: 'Roboto'),),
-        action: SnackBarAction(
-            label: 'UNDO', onPressed: scaffold.hideCurrentSnackBar),
-      ),
-    );
-  }
-
-  final screens = [
-    const HomeScreen(),
-    const AddListScreen(),
-    const ProfileScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final pageBody = [
+      const HomeScreen(),
+      const AddTransactionScreen(),
+      const ProfileScreen(),
+    ].elementAt(_selectedIndex);
+
+    final dynamic appBar = Platform.isIOS
+        ? CupertinoNavigationBar(
+            middle: Text(widget.title),
+            leading: CupertinoButton(
+              child: const Icon(CupertinoIcons.bars),
+              onPressed: () {
+                scaffoldKey.currentState!.openDrawer();
+              },
+            ),
+
+          )
+        : PreferredSize(
+            preferredSize: const Size.fromHeight(50),
+            child: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.menu, color: Colors.black),
+                onPressed: () => {scaffoldKey.currentState?.openDrawer()},
+              ),
+              title: Text(
+                widget.title,
+              ),
+            ));
+
     return Scaffold(
       key: scaffoldKey,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () => scaffoldKey.currentState?.openDrawer(),
-        ),
-        title: Text(widget.title,),
-      ),
+      appBar: appBar,
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -83,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
             const DrawerHeader(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage("images/img.png"),
+                  image: AssetImage("assets/images/img.png"),
                   fit: BoxFit.fill,
                 ),
               ),
@@ -120,22 +133,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: screens,
-      ),
-      // floating button hide
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //           builder: (context) => CallBackFunction(
-      //               text: "Clicked", onPressed: () => _showToast(context)))),
-      //   child: const Icon(Icons.navigate_next),
-      // ),
+      body: pageBody,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(
@@ -159,6 +158,8 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Profile',
           ),
         ],
+        onTap: _onItemTapped,
+        currentIndex: _selectedIndex,
         backgroundColor: Colors.blue,
         selectedItemColor: Colors.white,
       ),
