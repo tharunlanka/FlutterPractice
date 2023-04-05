@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_practice/routes/Routes.dart';
 import 'package:flutter_practice/widgets/ElevatedButtonWidget.dart';
-import 'package:flutter_practice/utilities/showSnackBar.dart';
+import '../utilities/showSnackBar.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class ProductScreen extends StatelessWidget {
+  const ProductScreen({super.key});
 
-  void moveToHomeScreen(BuildContext context) {
-    Navigator.pushNamed(context, homeRoute);
+  void moveToProductScreen(BuildContext context) {
+    Navigator.pushNamed(context, productOverview);
   }
+
 
   @override
   Widget build(BuildContext context) {
     return  Center(child:
     ElevatedButtonWidget(textData: "Show Snack Bar", onPressed: () {
       showSnackBar(context,()=> {
-       moveToHomeScreen(context)
+        moveToProductScreen(context)
       },"Are you sure you want to move home screen ?");
     },));
   }

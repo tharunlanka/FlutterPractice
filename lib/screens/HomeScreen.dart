@@ -56,29 +56,34 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return _questionNum < questionList.length
-        ? Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextWidget(
-                textData: questionList[_questionNum]["question"] as String,
+        ? SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextWidget(
+                    textData: questionList[_questionNum]["question"] as String,
+                  ),
+                  ElevatedButtonWidget(
+                    textData: getData(
+                        questionList[_questionNum], ["answers", "ans 1"]),
+                    onPressed: _onAnswered,
+                  ),
+                  ElevatedButtonWidget(
+                    textData: getData(
+                        questionList[_questionNum], ["answers", "ans 2"]),
+                    onPressed: _onAnswered,
+                  ),
+                  ElevatedButtonWidget(
+                    textData: getData(
+                        questionList[_questionNum], ["answers", "ans 3"]),
+                    onPressed: _onAnswered,
+                  )
+                ],
               ),
-              ElevatedButtonWidget(
-                textData:
-                    getData(questionList[_questionNum], ["answers", "ans 1"]),
-                onPressed: _onAnswered,
-              ),
-              ElevatedButtonWidget(
-                textData:
-                    getData(questionList[_questionNum], ["answers", "ans 2"]),
-                onPressed: _onAnswered,
-              ),
-              ElevatedButtonWidget(
-                textData:
-                    getData(questionList[_questionNum], ["answers", "ans 3"]),
-                onPressed: _onAnswered,
-              )
-            ],
+            ),
           )
         : LinearGradientWidget(
             gradientColors: const [
@@ -94,10 +99,11 @@ class _HomeScreen extends State<HomeScreen> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-            const CircleAvatar(
-              // network  image
-            backgroundImage:NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThwH3uhjDlPyydY9SCwGkPqeF4s1esHTEM2Q&usqp=CAU'),
-            ),
+                  const CircleAvatar(
+                    // network  image
+                    backgroundImage: NetworkImage(
+                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThwH3uhjDlPyydY9SCwGkPqeF4s1esHTEM2Q&usqp=CAU'),
+                  ),
                   const TextWidget(textData: "NO Questions to Practice"),
                   TextButton(
                       onPressed: _onBackPressed,

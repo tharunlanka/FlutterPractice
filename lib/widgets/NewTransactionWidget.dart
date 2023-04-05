@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_practice/models/ListTranscations.dart';
+import 'package:flutter_practice/utilities/database_helper.dart';
 import 'package:intl/intl.dart';
 import 'ElevatedButtonWidget.dart';
 
@@ -15,13 +17,18 @@ class _NewTransactionWidget extends State<NewTransactionWidget> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime? _selectedDate;
+  final DatabaseHelper _databaseHelper= DatabaseHelper.instance;
 
-  void _submitData() {
+  Future<void> _submitData() async {
     if (_amountController.text.isEmpty) {
       return;
     }
     final enteredTitle = _titleController.text;
     final enteredAmount = double.parse(_amountController.text);
+   var result= await _databaseHelper.insertList(ListTranscations(id:"0", title: enteredTitle, amount: enteredAmount, date: _selectedDate));
+   if(result!=0){
+     // successfully inserted data into database
+   }
     widget.addTx(
       enteredTitle,
       enteredAmount,
@@ -48,7 +55,10 @@ class _NewTransactionWidget extends State<NewTransactionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return SingleChildScrollView(
+        child: ConstrainedBox(
+        constraints: const BoxConstraints(),
+    child:Card(
       elevation: 5,
       child: Container(
         padding: const EdgeInsets.all(10),
@@ -94,6 +104,8 @@ class _NewTransactionWidget extends State<NewTransactionWidget> {
           ],
         ),
       ),
+    ),
+    ),
     );
   }
 }

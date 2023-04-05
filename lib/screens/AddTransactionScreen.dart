@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_practice/models/ListTranscations.dart';
 import 'package:flutter_practice/widgets/ChartWidget.dart';
 import 'package:flutter_practice/widgets/TransactionListWidget.dart';
-import '../../models/transaction.dart';
+import '../utilities/database_helper.dart';
 import '../widgets/NewTransactionWidget.dart';
 
 class AddTransactionScreen extends StatefulWidget {
@@ -12,22 +13,22 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class _AddTransactionScreen extends State<AddTransactionScreen> {
-  final List<Transaction> _userTransactions = [];
+  final List<ListTranscations> _userTransactions = [];
+  final List<Map<String,Object>> _userTransactionsFromDb = [];
+
   bool _showChart = false;
 
-  List<Transaction> get _recentTransactions {
-    return _userTransactions.where((tx) {
-      return tx.date.isAfter(
-        DateTime.now().subtract(
-          const Duration(days: 7),
-        ),
-      );
-    }).toList();
+
+  static _recentTransactions() async{
+    DatabaseHelper databaseHelper =DatabaseHelper.instance;
+    var result = await  databaseHelper.getTransactionList();
+    return result;
   }
+
 
   void _addNewTransaction(
       String txTitle, double txAmount, DateTime chosenDate) {
-    final newTx = Transaction(
+    final newTx = ListTranscations(
       title: txTitle,
       amount: txAmount,
       date: chosenDate,
@@ -64,7 +65,7 @@ class _AddTransactionScreen extends State<AddTransactionScreen> {
         MediaQuery.of(context).orientation == Orientation.landscape;
     final appBar = AppBar(
       title: const Text(
-        'Personal Expenses',
+        'Personal Expenses Tracker',
       ),
       actions: <Widget>[
         IconButton(
@@ -110,18 +111,21 @@ class _AddTransactionScreen extends State<AddTransactionScreen> {
                         appBar.preferredSize.height -
                         MediaQuery.of(context).padding.top) *
                     0.3,
-                child: ChartWidget(_recentTransactions),
+                child: ChartWidget( _userTransactionsFromDb),
               ),
             if (!isLandscape) txListWidget,
             if (isLandscape)
               _showChart
-                  ? SizedBox(
-                      height: (MediaQuery.of(context).size.height -
-                              appBar.preferredSize.height -
-                              MediaQuery.of(context).padding.top) *
-                          0.7,
-                      child: ChartWidget(_recentTransactions),
-                    )
+                  ? Column(children: [
+                      SizedBox(
+                        height: (MediaQuery.of(context).size.height -
+                                appBar.preferredSize.height -
+                                MediaQuery.of(context).padding.top) *
+                            0.5,
+                        child: ChartWidget(_userTransactionsFromDb),
+                      ),
+                      txListWidget
+                    ])
                   : txListWidget
           ],
         ),
