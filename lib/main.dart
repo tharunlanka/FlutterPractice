@@ -1,6 +1,7 @@
 import 'dart:async';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_practice/providers/cart.dart';
 import 'package:flutter_practice/providers/products.dart';
 import 'package:flutter_practice/routes/Routes.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_practice/screens/AddTransactionScreen.dart';
 import 'package:flutter_practice/screens/HomeScreen.dart';
 import 'package:flutter_practice/screens/ProfileScreen.dart';
 import 'package:flutter_practice/routes/Router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -68,9 +70,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void nextScreen() {
     if (isLogged) {
-      Navigator.pushNamed(context, homeRoute);
+      Navigator.popAndPushNamed(context, homeRoute);
     } else {
-      Navigator.pushNamed(context, loginRoute);
+      Navigator.popAndPushNamed(context, loginRoute);
     }
   }
 
@@ -115,6 +117,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
+  bool isPhotoUploaded=false;
+  File? image;
 
   void _onItemTapped(int index) {
     if (index == 3) {
@@ -125,9 +129,43 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
+  @override
+  void initState() {
+    super.initState();
+    getHeaderData();
+  }
 
   void moveToProfileScreen() {
     Navigator.pushNamed(context, profileRoute);
+  }
+  saveImageUploadValueInSharedPref(String path) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isHeaderUploaded', true);
+    prefs.setString('imagePath',path);
+  }
+
+  getHeaderData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? value = prefs.getBool('isHeaderUploaded');
+    String? imagePath = prefs.getString('imagePath');
+    if (value != null) isPhotoUploaded = value;
+    if (imagePath != null) image = File(imagePath);
+    setState(() {});
+  }
+
+  Future pickImage() async {
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if(image == null) return;
+      setState(() => {
+        this.image = File(image.path),
+        isPhotoUploaded=true,
+        saveImageUploadValueInSharedPref(image.path)
+      }
+      );
+    } on PlatformException catch(e) {
+      print('Failed to pick image: $e');
+    }
   }
 
   @override
@@ -155,18 +193,15 @@ class _MyHomePageState extends State<MyHomePage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/img.png"),
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    'Select Tech',
-                  ),
-                ),
+              !isPhotoUploaded? DrawerHeader(child:
+              ElevatedButton(
+              onPressed: () =>{
+                pickImage()
+              }
+                , child: const Text("Pick Image from Gallery"),)
+                ,): DrawerHeader(child: Image.file(image!,
+                fit: BoxFit.cover,
+                width: double.infinity,),
               ),
               ListTile(
                 title: const Text('Flutter'),

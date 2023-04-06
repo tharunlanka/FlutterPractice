@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_practice/routes/Routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../routes/Routes.dart';
+import '../utilities/InputFormMixIn.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,19 +10,26 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with InputValidationMixin {
+  final _formKey = GlobalKey<FormState>();
 
   saveLoggedValueInSharedpref() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('isLogged', true);
   }
 
+
   @override
   Widget build(BuildContext context) {
+    TextEditingController emailInput = TextEditingController();
+    TextEditingController passwordInput = TextEditingController();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: Column(
+        child:Form(
+        key: _formKey,
+          child:Column(
           children: <Widget>[
            const Padding(
               padding: EdgeInsets.only(top: 60.0),
@@ -32,25 +40,41 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: FlutterLogo()),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: TextField(
-                decoration: InputDecoration(
+             Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: TextFormField(
+                controller: emailInput,
+                decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Email',
                     hintText: 'Enter valid email'),
+                validator: (email) {
+                  if (isEmailValid(email!)) {
+                    return null;
+                  } else {
+                    return 'Enter a valid email address';
+                  }
+                },
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(
+             Padding(
+              padding: const EdgeInsets.only(
                   left: 15.0, right: 15.0, top: 15, bottom: 0),
-              child: TextField(
-
+              child: TextFormField(
+                controller: passwordInput,
                 obscureText: true,
-                decoration: InputDecoration(
+                maxLength: 6,
+                decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Password',
                     hintText: 'Enter secure password'),
+                validator: (password) {
+                  if (isPasswordValid(password!)) {
+                    return null;
+                  } else {
+                    return 'Enter a valid password';
+                  }
+                },
               ),
             ),
             TextButton(
@@ -69,8 +93,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.blue, borderRadius: BorderRadius.circular(20)),
               child: ElevatedButton(
                 onPressed: () {
-                  saveLoggedValueInSharedpref();
-                  Navigator.pushNamed(context, homeRoute);
+                  if (_formKey.currentState!.validate()) {
+                    saveLoggedValueInSharedpref();
+                    Navigator.pop(context,true);
+                    Navigator.pushNamed(context, homeRoute);
+                  }
                 },
                 child: const Text(
                   'Login',
@@ -84,6 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const Text('New User? Create Account')
           ],
         ),
+      ),
       ),
     );
   }
