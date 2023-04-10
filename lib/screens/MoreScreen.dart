@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_practice/screens/ListFromApiScreen.dart';
 import 'package:flutter_practice/screens/ProductScreen.dart';
 import 'AnimationScreen.dart';
-import 'ProfileScreen.dart';
 
 class MoreScreen extends StatefulWidget {
   const MoreScreen({Key? key}) : super(key: key);
