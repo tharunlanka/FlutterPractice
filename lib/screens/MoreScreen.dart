@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_practice/screens/ListFromApiScreen.dart';
 import 'package:flutter_practice/screens/ProductScreen.dart';
-import 'DummyScreen.dart';
+import 'AnimationScreen.dart';
 import 'ProfileScreen.dart';
 
 class MoreScreen extends StatefulWidget {
@@ -35,7 +35,7 @@ class _MoreScreenState extends State<MoreScreen>
             controller: _controller,
             tabs: const [
               Tab(icon: Icon(Icons.message), text: 'Chats'),
-              Tab(icon: Icon(Icons.rotate_left_rounded), text: 'Status'),
+              Tab(icon: Icon(Icons.animation), text: 'Animation'),
               Tab(icon: Icon(Icons.shopping_cart_outlined), text: 'Products')
             ],
           )),
@@ -44,7 +44,7 @@ class _MoreScreenState extends State<MoreScreen>
         controller: _controller,
         children: const <Widget>[
           ListFromApiScreen(),
-          DummyScreen(),
+          AnimationScreen(),
           ProductScreen(),
         ],
       ),

@@ -1,7 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_practice/models/request/Authentication.dart';
+import 'package:flutter_practice/utilities/fieldValidator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/Routes.dart';
-import '../utilities/InputFormMixIn.dart';
+import 'package:firebase_database/firebase_database.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,10 +14,13 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with InputValidationMixin {
+class _LoginScreenState extends State<LoginScreen>  {
   final _formKey = GlobalKey<FormState>();
+  DatabaseReference ref = FirebaseDatabase.instance.ref();
+  TextEditingController emailInput = TextEditingController();
+  TextEditingController passwordInput = TextEditingController();
 
-  saveLoggedValueInSharedpref() async {
+  saveLoggedValueInSharedPref() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('isLogged', true);
   }
@@ -21,8 +28,6 @@ class _LoginScreenState extends State<LoginScreen> with InputValidationMixin {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController emailInput = TextEditingController();
-    TextEditingController passwordInput = TextEditingController();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -49,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> with InputValidationMixin {
                     labelText: 'Email',
                     hintText: 'Enter valid email'),
                 validator: (email) {
-                  if (isEmailValid(email!)) {
+                  if (Validator.validateEmail(email!) == null) {
                     return null;
                   } else {
                     return 'Enter a valid email address';
@@ -63,13 +68,13 @@ class _LoginScreenState extends State<LoginScreen> with InputValidationMixin {
               child: TextFormField(
                 controller: passwordInput,
                 obscureText: true,
-                maxLength: 6,
+                maxLength: 8,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Password',
                     hintText: 'Enter secure password'),
                 validator: (password) {
-                  if (isPasswordValid(password!)) {
+                  if (Validator.validatePassword(password!)==null) {
                     return null;
                   } else {
                     return 'Enter a valid password';
@@ -92,11 +97,34 @@ class _LoginScreenState extends State<LoginScreen> with InputValidationMixin {
               decoration: BoxDecoration(
                   color: Colors.blue, borderRadius: BorderRadius.circular(20)),
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    saveLoggedValueInSharedpref();
-                    Navigator.pop(context,true);
-                    Navigator.pushNamed(context, homeRoute);
+                    _formKey.currentState!.save();
+                    try {
+                      DatabaseReference ref = FirebaseDatabase.instance.ref("users");
+                     ref.once().then((value) => {
+                       value.snapshot.children.forEach((user) {
+                         final data = Map<String, dynamic>.from(user.value as Map);
+                         LoginRequest request = LoginRequest.fromJson(data);
+                         if(emailInput.text==request.email.toString() && passwordInput.text==request.password.toString()){
+                           saveLoggedValueInSharedPref();
+                           Navigator.pop(context,true);
+                           Navigator.pushNamed(context, homeRoute);
+                         }
+                         else{
+                           const Center(child: Text('Unable To Login',textDirection: TextDirection.ltr,));
+                         }
+                       })
+                     });
+
+                      // DataSnapshot
+
+
+                    } catch (e) {
+                      if (kDebugMode) {
+                        print(e);
+                      }
+                    }
                   }
                 },
                 child: const Text(
@@ -108,7 +136,12 @@ class _LoginScreenState extends State<LoginScreen> with InputValidationMixin {
             const SizedBox(
               height: 130,
             ),
-            const Text('New User? Create Account')
+            TextButton(
+              onPressed: (){
+                Navigator.popAndPushNamed(context, registerRoute);
+              },
+              child: const Text('New User? Create Account',)
+            ),
           ],
         ),
       ),

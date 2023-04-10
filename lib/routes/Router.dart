@@ -6,6 +6,7 @@ import 'package:flutter_practice/screens/MoreScreen.dart';
 import 'package:flutter_practice/screens/ProductScreen.dart';
 import 'package:flutter_practice/screens/ProfileScreen.dart';
 import 'package:flutter_practice/routes/Routes.dart';
+import 'package:flutter_practice/screens/SignUpScreen.dart';
 import 'package:flutter_practice/screens/cart_screen.dart';
 import 'package:flutter_practice/screens/products_overview_screen.dart';
 import '../models/ScreenArguments.dart';
@@ -23,6 +24,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const AddTransactionScreen());
         case loginRoute:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+        case registerRoute:
+        return MaterialPageRoute(builder: (_) => const SignUpScreen());
       case profileRoute:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
       case moreRoute:

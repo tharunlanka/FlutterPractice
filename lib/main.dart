@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_practice/providers/cart.dart';
@@ -12,49 +13,63 @@ import 'package:flutter_practice/routes/Router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'firebase_options.dart';
 
-void main() {
-  // to set the orientation in portrait only
-  // WidgetsFlutterBinding.ensureInitialized();
-  //
-  // SystemChrome.setPreferredOrientations(
-  //     [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  runApp(const MyApp());
+
+void main()   {
+  WidgetsFlutterBinding.ensureInitialized();
+ runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(
-            value: Products(),
-          ),
-          ChangeNotifierProvider.value(
-            value: Cart(),
-          ),
-        ],
-        child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Flutter Practice',
-            // adding routes to app,
-            onGenerateRoute: AppRouter().generateRoute,
-            theme: ThemeData(
-              // UI
-              // font
-              fontFamily: 'Roboto',
-              //text style
-              textTheme: const TextTheme(
-                displayLarge:
-                    TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-                titleLarge:
-                    TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
-                bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Roboto'),
-              ),
-            )));
+    return
+      FutureBuilder(
+        future:Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform),
+        // Initialize FlutterFire
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(child: Text("Error While Initializing the firebase ",textDirection: TextDirection.ltr,),);
+          }
+
+          // Once complete, show your application
+          if (snapshot.connectionState == ConnectionState.done) {
+            return  MultiProvider(
+                providers: [
+                  ChangeNotifierProvider.value(
+                    value: Products(),
+                  ),
+                  ChangeNotifierProvider.value(
+                    value: Cart(),
+                  ),
+                ],
+                child: MaterialApp(
+                    debugShowCheckedModeBanner: false,
+                    title: 'Flutter Practice',
+                    // adding routes to app,
+                    onGenerateRoute: AppRouter().generateRoute,
+                    theme: ThemeData(
+                      // UI
+                      // font
+                      fontFamily: 'Roboto',
+                      //text style
+                      textTheme: const TextTheme(
+                        displayLarge:
+                        TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+                        titleLarge:
+                        TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+                        bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Roboto'),
+                      ),
+                    )));
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
+
   }
 }
 
