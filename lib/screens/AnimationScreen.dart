@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:transparent_image/transparent_image.dart';
+import 'package:flutter_practice/routes/Routes.dart';
+
 
 class AnimationScreen extends StatefulWidget {
   const AnimationScreen({Key? key}) : super(key: key);
@@ -57,13 +58,34 @@ class _AnimationScreenState extends State<AnimationScreen>
                   height: sizeAnimation.value,
                   width: sizeAnimation.value,
                   color: colorAnimation.value,
-                  child: FadeInImage.memoryNetwork(
-                    placeholder: kTransparentImage,
-                    image: "https://cdn.pixabay.com/photo/2016/11/29/12/13/fence-1869401_1280.jpg",
-                    fadeInCurve: Curves.easeInOut,
-                    fit: BoxFit.contain,
-                    alignment: Alignment.bottomRight,
+                  child:
+                    // faded animations
+                  // FadeInImage.memoryNetwork(
+                  //   placeholder: kTransparentImage,
+                  //   image: "https://cdn.pixabay.com/photo/2016/11/29/12/13/fence-1869401_1280.jpg",
+                  //   fadeInCurve: Curves.easeInOut,
+                  //   fit: BoxFit.contain,
+                  //   alignment: Alignment.bottomRight,
+                  // ),
+
+
+                  // hero transsition
+                   Hero(
+                    tag: "HeroOne",
+                    child:
+                      GestureDetector(
+                        onTap:()=> {
+                          // navigate to sliver screen
+                          Navigator.pushNamed(context,sliver)
+                        },
+                        child: const Icon(
+                          Icons.add,
+                          size: 50.0,
+                        ) ,
+                    ),
                   ),
+
+                  //
                 ),
               ),
             );

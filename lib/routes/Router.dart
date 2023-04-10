@@ -7,6 +7,7 @@ import 'package:flutter_practice/screens/ProductScreen.dart';
 import 'package:flutter_practice/screens/ProfileScreen.dart';
 import 'package:flutter_practice/routes/Routes.dart';
 import 'package:flutter_practice/screens/SignUpScreen.dart';
+import 'package:flutter_practice/screens/SliverScreen.dart';
 import 'package:flutter_practice/screens/cart_screen.dart';
 import 'package:flutter_practice/screens/products_overview_screen.dart';
 import '../models/ScreenArguments.dart';
@@ -36,6 +37,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ProductsOverviewScreen());
       case product:
         return MaterialPageRoute(builder: (_) => const ProductScreen());
+        case sliver:
+        return MaterialPageRoute(builder: (_) => const SliverScreen());
       case userDetails:
         {
           final args = settings.arguments as ScreenArguments;
