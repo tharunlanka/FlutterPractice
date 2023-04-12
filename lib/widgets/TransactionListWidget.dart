@@ -68,7 +68,7 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
                     ),
                     subtitle: Text(
                       DateFormat.yMMMd()
-                          .format(widget.transactions[index].date),
+                          .format(widget.transactions[index].date!),
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),

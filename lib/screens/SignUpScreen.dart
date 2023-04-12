@@ -26,12 +26,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         backgroundColor: Colors.green.shade300,
       ));
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
+     // await httpClient.get(url,headers: {'Authorization':"Bearer ${tokenResult.token}"})
       final url = Uri.parse(ApiConstants.baseUrl+ApiConstants.users);
       http.post(url,body: json.encode({
         'email' : emailController.text,
         'password' : passwordController.text,
-      })).then((value) =>
+      },)).then((value) =>
           Navigator.pushNamed(context, loginRoute)
       ).onError((error, stackTrace) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

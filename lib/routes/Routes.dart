@@ -12,3 +12,5 @@ const String productOverview = '/productOverview';
 const String product =  '/product';
 const String sliver =  '/sliver';
 const String productDetail =  '/productDetail';
+const String addPerson =  '/addPerson';
+const String location =  '/location';

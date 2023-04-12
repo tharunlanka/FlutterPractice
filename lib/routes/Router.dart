@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_practice/main.dart';
+import 'package:flutter_practice/screens/AddPersonScreen.dart';
 import 'package:flutter_practice/screens/AddTransactionScreen.dart';
 import 'package:flutter_practice/screens/LoginScreen.dart';
 import 'package:flutter_practice/screens/MoreScreen.dart';
+import 'package:flutter_practice/screens/PersonScreen.dart';
 import 'package:flutter_practice/screens/ProductScreen.dart';
 import 'package:flutter_practice/screens/ProfileScreen.dart';
 import 'package:flutter_practice/routes/Routes.dart';
@@ -10,6 +12,7 @@ import 'package:flutter_practice/screens/SignUpScreen.dart';
 import 'package:flutter_practice/screens/SliverScreen.dart';
 import 'package:flutter_practice/screens/cart_screen.dart';
 import 'package:flutter_practice/screens/products_overview_screen.dart';
+import 'package:flutter_practice/widgets/LocationScreen.dart';
 import '../models/ScreenArguments.dart';
 import '../screens/UserDetailsScreen.dart';
 
@@ -39,6 +42,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ProductScreen());
         case sliver:
         return MaterialPageRoute(builder: (_) => const SliverScreen());
+      case location:
+        return MaterialPageRoute(builder: (_) => const LocationScreen());
+      case addPerson:
+        return MaterialPageRoute(builder: (_) => const PersonScreen());
       case userDetails:
         {
           final args = settings.arguments as ScreenArguments;

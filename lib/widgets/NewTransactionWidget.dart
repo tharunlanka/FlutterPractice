@@ -94,7 +94,7 @@ class _NewTransactionWidget extends State<NewTransactionWidget> {
               child: Text(
                 _selectedDate == null
                     ? 'No Date Chosen!'
-                    : 'Picked Date: ${DateFormat.yMd().format(_selectedDate)}',
+                    : 'Picked Date: ${DateFormat.yMd().format(_selectedDate!)}',
               ),
             ),
             ElevatedButtonWidget(

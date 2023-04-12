@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_practice/models/People.dart';
 import 'package:flutter_practice/providers/cart.dart';
 import 'package:flutter_practice/providers/products.dart';
 import 'package:flutter_practice/routes/Routes.dart';
@@ -13,24 +16,32 @@ import 'package:flutter_practice/screens/DisplayPictureScreen.dart';
 import 'package:flutter_practice/screens/HomeScreen.dart';
 import 'package:flutter_practice/screens/ProfileScreen.dart';
 import 'package:flutter_practice/routes/Router.dart';
-import 'package:flutter_practice/widgets/LocationScreen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:location/location.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'adapter/PeopleAdapter.dart';
+import 'auth/AuthProvider.dart';
 import 'firebase_options.dart';
 
 
-List<CameraDescription> cameras = [];
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  final document = await getApplicationDocumentsDirectory();
+  await Hive.initFlutter(document.path);
+  await Hive.openBox('peopleBox');
+  Hive.registerAdapter(PeopleAdapter());
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  runApp( MyApp(prefs: prefs,));
 }
-
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final SharedPreferences prefs;
+  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+  MyApp({Key? key, required this.prefs}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +69,12 @@ class MyApp extends StatelessWidget {
                 ChangeNotifierProvider.value(
                   value: Cart(),
                 ),
+                ChangeNotifierProvider<AuthProvider>(
+                    create: (_) => AuthProvider(
+                        firebaseFirestore: firebaseFirestore,
+                        prefs: prefs,
+                        googleSignIn: GoogleSignIn(),
+                        firebaseAuth: FirebaseAuth.instance)),
               ],
               child: MaterialApp(
                   debugShowCheckedModeBanner: false,
@@ -267,9 +284,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 title: const Text('Location'),
                 onTap: () async {
                   scaffoldKey.currentState?.openEndDrawer();
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LocationScreen()));
+                  Navigator.pushNamed(context, location);
                 },
                 leading: const Icon(Icons.add_location_sharp),
+                trailing: const Icon(Icons.navigate_next_outlined),
+              ),
+              ListTile(
+                title: const Text('Hive Storage'),
+                onTap: () async {
+                  scaffoldKey.currentState?.openEndDrawer();
+                  Navigator.pushNamed(context, addPerson);
+                },
+                leading: const Icon(Icons.person),
                 trailing: const Icon(Icons.navigate_next_outlined),
               )
             ],

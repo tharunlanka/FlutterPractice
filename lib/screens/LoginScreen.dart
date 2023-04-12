@@ -2,7 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_practice/models/request/Authentication.dart';
 import 'package:flutter_practice/utilities/fieldValidator.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../auth/AuthProvider.dart';
 import '../routes/Routes.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -28,6 +31,22 @@ class _LoginScreenState extends State<LoginScreen>  {
 
   @override
   Widget build(BuildContext context) {
+
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    switch (authProvider.status) {
+      case Status.authenticateError:
+        Fluttertoast.showToast(msg: 'Sign in failed');
+        break;
+      case Status.authenticateCanceled:
+        Fluttertoast.showToast(msg: 'Sign in cancelled');
+        break;
+      case Status.authenticated:
+        Fluttertoast.showToast(msg: 'Sign in successful');
+        break;
+      default:
+        break;
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -132,6 +151,16 @@ class _LoginScreenState extends State<LoginScreen>  {
                   style: TextStyle(color: Colors.white, fontSize: 25),
                 ),
               ),
+            ),
+
+            GestureDetector(
+              onTap: () async {
+                bool isSuccess = await authProvider.handleGoogleSignIn();
+                if (isSuccess) {
+                  Navigator.pushNamed(context, homeRoute);
+                }
+              },
+              child: Image.asset('assets/images/google_sign_in.png'),
             ),
             const SizedBox(
               height: 130,
