@@ -11,6 +11,7 @@ import 'package:flutter_practice/routes/Routes.dart';
 import 'package:flutter_practice/screens/SignUpScreen.dart';
 import 'package:flutter_practice/screens/SliverScreen.dart';
 import 'package:flutter_practice/screens/cart_screen.dart';
+import 'package:flutter_practice/screens/chat_screen.dart';
 import 'package:flutter_practice/screens/products_overview_screen.dart';
 import 'package:flutter_practice/widgets/LocationScreen.dart';
 import '../models/ScreenArguments.dart';
@@ -46,6 +47,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const LocationScreen());
       case addPerson:
         return MaterialPageRoute(builder: (_) => const PersonScreen());
+      case chats:
+        return MaterialPageRoute(builder: (_) => const ChatScreen());
       case userDetails:
         {
           final args = settings.arguments as ScreenArguments;

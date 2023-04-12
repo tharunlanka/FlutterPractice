@@ -7,7 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_practice/models/People.dart';
 import 'package:flutter_practice/providers/cart.dart';
 import 'package:flutter_practice/providers/products.dart';
 import 'package:flutter_practice/routes/Routes.dart';
@@ -35,6 +34,7 @@ Future<void> main() async {
   await Hive.openBox('peopleBox');
   Hive.registerAdapter(PeopleAdapter());
   SharedPreferences prefs = await SharedPreferences.getInstance();
+  await Firebase.initializeApp();
   runApp( MyApp(prefs: prefs,));
 }
 class MyApp extends StatelessWidget {
@@ -46,8 +46,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform),
+      future: Firebase.initializeApp(),
       // Initialize FlutterFire
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -110,27 +109,23 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  bool isLogged = false;
 
-  void nextScreen() {
-    if (isLogged) {
+
+  Future<void> nextScreen() async {
+    final authProvider = Provider.of<AuthProvider>(context,listen: false);
+    var isLogged= await authProvider.isLoggedIn();
+    if (isLogged && context.mounted) {
       Navigator.popAndPushNamed(context, homeRoute);
     } else {
       Navigator.popAndPushNamed(context, loginRoute);
     }
   }
 
-  getAllSavedData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool? value = prefs.getBool('isLogged');
-    if (value != null) isLogged = value;
-    setState(() {});
-  }
+
 
   @override
   void initState() {
     super.initState();
-    getAllSavedData();
     Timer(const Duration(seconds: 4), () => nextScreen());
   }
 
@@ -234,6 +229,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     final pageBody = [
       const HomeScreen(),
       const AddTransactionScreen(),
@@ -296,6 +293,27 @@ class _MyHomePageState extends State<MyHomePage> {
                   Navigator.pushNamed(context, addPerson);
                 },
                 leading: const Icon(Icons.person),
+                trailing: const Icon(Icons.navigate_next_outlined),
+              ),
+              ListTile(
+                title: const Text('Chats'),
+                onTap: () async {
+                  scaffoldKey.currentState?.openEndDrawer();
+                  Navigator.pushNamed(context, chats);
+                },
+                leading: const Icon(Icons.message),
+                trailing: const Icon(Icons.navigate_next_outlined),
+              ),
+              ListTile(
+                title: const Text('Log Out'),
+                onTap: () async {
+                  scaffoldKey.currentState?.openEndDrawer();
+                  bool isLoggedOut= await authProvider.googleSignOut();
+                  if(isLoggedOut && context.mounted){
+                    Navigator.pushNamed(context, loginRoute);
+                  }
+                },
+                leading: const Icon(Icons.logout_outlined),
                 trailing: const Icon(Icons.navigate_next_outlined),
               )
             ],

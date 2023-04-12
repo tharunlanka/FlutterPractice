@@ -37,8 +37,8 @@ class AuthProvider extends ChangeNotifier {
 
   Future<bool> isLoggedIn() async {
     bool isLoggedIn = await googleSignIn.isSignedIn();
-    if (isLoggedIn &&
-        prefs.getString(FirestoreConstants.id)?.isNotEmpty == true) {
+    if ((isLoggedIn &&
+        prefs.getString(FirestoreConstants.id)?.isNotEmpty == true ) || prefs.getBool('isLogged')==true) {
       return true;
     } else {
       return false;
@@ -111,10 +111,13 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> googleSignOut() async {
+  Future<bool> googleSignOut() async {
     _status = Status.uninitialized;
+    prefs.clear();
     await firebaseAuth.signOut();
     await googleSignIn.disconnect();
     await googleSignIn.signOut();
+
+    return true;
   }
 }
