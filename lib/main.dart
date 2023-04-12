@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,17 +26,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'adapter/PeopleAdapter.dart';
 import 'auth/AuthProvider.dart';
 import 'firebase_options.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'notifications/PushNotificationService.dart';
+
 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final document = await getApplicationDocumentsDirectory();
+  await PushNotificationService().setupInteractedMessage();
   await Hive.initFlutter(document.path);
   await Hive.openBox('peopleBox');
   Hive.registerAdapter(PeopleAdapter());
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await Firebase.initializeApp();
   runApp( MyApp(prefs: prefs,));
+  RemoteMessage? initialMessage =
+  await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+
+  }
+  await Permission.notification.isDenied.then(
+        (bool value) {
+      if (value) {
+        Permission.notification.request();
+      }
+    },
+  );
 }
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;
