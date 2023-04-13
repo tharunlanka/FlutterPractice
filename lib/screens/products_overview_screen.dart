@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_practice/routes/Routes.dart';
 import 'package:provider/provider.dart';
 import '../widgets/products_grid.dart';
-import '../providers/cart.dart';
+import '../models/cart.dart';
 
 enum FilterOptions {
   Favorites,

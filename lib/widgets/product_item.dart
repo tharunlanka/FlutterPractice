@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_practice/routes/Routes.dart';
 import 'package:provider/provider.dart';
 import '../models/ScreenArguments.dart';
-import '../providers/product.dart';
-import '../providers/cart.dart';
+import '../models/product.dart';
+import '../models/cart.dart';
 
 class ProductItem extends StatelessWidget {
 
@@ -44,7 +44,7 @@ class ProductItem extends StatelessWidget {
         child: GestureDetector(
           onTap: () {
             Navigator.pushNamed(context, userDetails,
-                arguments: ScreenArguments( product.title,product.imageUrl)
+                arguments: ScreenArguments(title:product.title,image:product.imageUrl)
             );
           },
           child: Image.network(

@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../constants/FirestoreConstants.dart';
-import '../models/ChatUser.dart';
+import 'package:flutter_practice/constants/FirestoreConstants.dart';
+import 'package:flutter_practice/models/ChatUser.dart';
 
 enum Status {
   uninitialized,

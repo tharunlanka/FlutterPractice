@@ -8,14 +8,16 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_practice/providers/cart.dart';
-import 'package:flutter_practice/providers/products.dart';
+import 'package:flutter_practice/models/cart.dart';
+import 'package:flutter_practice/models/products.dart';
+import 'package:flutter_practice/providers/auth/AuthProvider.dart';
 import 'package:flutter_practice/routes/Routes.dart';
 import 'package:flutter_practice/screens/AddTransactionScreen.dart';
 import 'package:flutter_practice/screens/DisplayPictureScreen.dart';
 import 'package:flutter_practice/screens/HomeScreen.dart';
 import 'package:flutter_practice/screens/ProfileScreen.dart';
 import 'package:flutter_practice/routes/Router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -24,12 +26,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'adapter/PeopleAdapter.dart';
-import 'auth/AuthProvider.dart';
-import 'firebase_options.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'notifications/PushNotificationService.dart';
-
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,24 +38,48 @@ Future<void> main() async {
   Hive.registerAdapter(PeopleAdapter());
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await Firebase.initializeApp();
-  runApp( MyApp(prefs: prefs,));
-  RemoteMessage? initialMessage =
-  await FirebaseMessaging.instance.getInitialMessage();
-  if (initialMessage != null) {
+  runApp(MyApp(
+    prefs: prefs,
+  ));
 
-  }
+  // RemoteMessage? initialMessage =
+  //     await FirebaseMessaging.instance.getInitialMessage();
+
+  // onMessage is called when the app is in foreground and a notification is received
+  FirebaseMessaging.onMessage.listen((RemoteMessage? message) {
+
+    final RemoteNotification? notification = message!.notification;
+    final AndroidNotification? android = message.notification?.android;
+// If `onMessage` is triggered with a notification
+    // local notification to show to users using the created channel.
+    if (notification != null && android != null) {
+     var data=message.data[0]['name'];
+     Fluttertoast.showToast(msg: data);
+    }
+  });
+  //
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage? message) {
+    final RemoteNotification? notification = message!.notification;
+    final AndroidNotification? android = message.notification?.android;
+    if (notification != null && android != null) {
+      Fluttertoast.showToast(msg: notification.title!);
+    }
+  },);
+
   await Permission.notification.isDenied.then(
-        (bool value) {
+    (bool value) {
       if (value) {
         Permission.notification.request();
       }
     },
   );
 }
+
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+
   MyApp({Key? key, required this.prefs}) : super(key: key);
 
   @override
@@ -126,19 +148,15 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
-
   Future<void> nextScreen() async {
-    final authProvider = Provider.of<AuthProvider>(context,listen: false);
-    var isLogged= await authProvider.isLoggedIn();
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    var isLogged = await authProvider.isLoggedIn();
     if (isLogged && context.mounted) {
       Navigator.popAndPushNamed(context, homeRoute);
     } else {
       Navigator.popAndPushNamed(context, loginRoute);
     }
   }
-
-
 
   @override
   void initState() {
@@ -176,7 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   bool isPhotoUploaded = false;
   File? image;
-  File _image=File('');
+  File _image = File('');
   final picker = ImagePicker();
 
   void _onItemTapped(int index) {
@@ -230,17 +248,18 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-
   // get image from default camera
   Future<void> _getImage() async {
     print("clicked");
-    final PickedFile? pickedImage = await picker.getImage(source: ImageSource.camera);
+    final PickedFile? pickedImage =
+        await picker.getImage(source: ImageSource.camera);
     if (pickedImage == null) return;
     File tmpFile = File(pickedImage.path);
     tmpFile = await tmpFile.copy(tmpFile.path);
     setState(() {
       _image = File(pickedImage.path);
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => DisplayPictureScreen(image: _image)));
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => DisplayPictureScreen(image: _image)));
     });
   }
 
@@ -288,7 +307,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ListTile(
                 title: const Text('Camera'),
                 onTap: () async {
-                   await _getImage();
+                  await _getImage();
                   scaffoldKey.currentState?.openEndDrawer();
                 },
                 leading: const Icon(Icons.camera),
@@ -321,12 +340,22 @@ class _MyHomePageState extends State<MyHomePage> {
                 leading: const Icon(Icons.message),
                 trailing: const Icon(Icons.navigate_next_outlined),
               ),
+
+              ListTile(
+                title: const Text('Battery'),
+                onTap: () async {
+                  scaffoldKey.currentState?.openEndDrawer();
+                  Navigator.pushNamed(context, battery);
+                },
+                leading: const Icon(Icons.battery_6_bar_sharp),
+                trailing: const Icon(Icons.navigate_next_outlined),
+              ),
               ListTile(
                 title: const Text('Log Out'),
                 onTap: () async {
                   scaffoldKey.currentState?.openEndDrawer();
-                  bool isLoggedOut= await authProvider.googleSignOut();
-                  if(isLoggedOut && context.mounted){
+                  bool isLoggedOut = await authProvider.googleSignOut();
+                  if (isLoggedOut && context.mounted) {
                     Navigator.pushNamed(context, loginRoute);
                   }
                 },

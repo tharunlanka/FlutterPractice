@@ -5,7 +5,7 @@ import 'package:flutter_practice/utilities/fieldValidator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../auth/AuthProvider.dart';
+import 'package:flutter_practice/providers/auth/AuthProvider.dart';
 import '../routes/Routes.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -133,12 +133,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Navigator.pop(context, true);
                                   Navigator.pushNamed(context, homeRoute);
                                 } else {
-                                  Fluttertoast.showToast(msg: 'Sign in failed');
-                                  const Center(
-                                      child: Text(
-                                    'Unable To Login',
-                                    textDirection: TextDirection.ltr,
-                                  ));
                                 }
                               })
                             });

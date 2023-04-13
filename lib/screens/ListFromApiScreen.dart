@@ -30,11 +30,11 @@ class _ListFromApiScreen extends State<ListFromApiScreen> {
 
     void navigateToDetailScreen(String? title,String? avatar){
       Navigator.pushNamed(context, userDetails,
-        arguments: ScreenArguments(title??" no title",avatar??  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThwH3uhjDlPyydY9SCwGkPqeF4s1esHTEM2Q&usqp=CAU')
-      );
+          arguments: ScreenArguments(
+              title: title!,
+              image: avatar!
+          ),);
     }
-
-
 
     return FutureBuilder(
       future: fetchDetails(),
@@ -54,7 +54,7 @@ class _ListFromApiScreen extends State<ListFromApiScreen> {
                       NetworkImage(list.data![index].avatar.toString()),),
                   subtitle: Text(list.data![index].amount.toString()),
                   onTap: ()=>{
-                    navigateToDetailScreen(list.data![index].name,list.data![index].avatar)
+                   navigateToDetailScreen(list.data![index].name,list.data![index].avatar)
                   },
                 );
               });

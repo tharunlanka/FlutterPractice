@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_practice/main.dart';
 import 'package:flutter_practice/screens/AddPersonScreen.dart';
 import 'package:flutter_practice/screens/AddTransactionScreen.dart';
+import 'package:flutter_practice/screens/BatteryScreen.dart';
 import 'package:flutter_practice/screens/LoginScreen.dart';
 import 'package:flutter_practice/screens/MoreScreen.dart';
 import 'package:flutter_practice/screens/PersonScreen.dart';
@@ -45,6 +46,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const SliverScreen());
       case location:
         return MaterialPageRoute(builder: (_) => const LocationScreen());
+      case battery:
+        return MaterialPageRoute(builder: (_) => const BatteryScreen());
       case addPerson:
         return MaterialPageRoute(builder: (_) => const PersonScreen());
       case chats:

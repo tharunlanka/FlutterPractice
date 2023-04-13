@@ -15,3 +15,4 @@ const String productDetail =  '/productDetail';
 const String addPerson =  '/addPerson';
 const String chats =  '/chats';
 const String location =  '/location';
+const String battery =  '/battery';

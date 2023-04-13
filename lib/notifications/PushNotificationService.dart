@@ -5,13 +5,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 class PushNotificationService {
   Future<void> setupInteractedMessage() async {
     await Firebase.initializeApp();
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // Get.toNamed(NOTIFICATIONS_ROUTE);
-      if (message.data['type'] == 'chat') {
-        // Navigator.pushNamed(context, '/chat',
-        //     arguments: ChatArguments(message));
-      }
-    });
     enableIOSNotifications();
     await registerNotificationListeners();
   }
@@ -37,31 +30,6 @@ class PushNotificationService {
       initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse details) {},
     );
-// onMessage is called when the app is in foreground and a notification is received
-    FirebaseMessaging.onMessage.listen((RemoteMessage? message) {
-      // homeController.getHomeData(
-      //   withLoading: false,
-      // );
-      final RemoteNotification? notification = message!.notification;
-      final AndroidNotification? android = message.notification?.android;
-// If `onMessage` is triggered with a notification, construct our own
-      // local notification to show to users using the created channel.
-      if (notification != null && android != null) {
-        flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channelDescription: channel.description,
-              icon: android.smallIcon,
-            ),
-          ),
-        );
-      }
-    });
   }
   Future<void> enableIOSNotifications() async {
     await FirebaseMessaging.instance
